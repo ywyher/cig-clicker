@@ -5,7 +5,8 @@ import { RoomState } from "./schema/room-state";
 export class Room extends ColyRoom {
   maxClients = 4;
   state = new RoomState();
-
+  private reconnections = new Map<string, ReturnType<typeof this.allowReconnection>>();
+  
   messages = {
     start: (client: Client) => {
       if (client.sessionId !== this.state.adminId) return; // ignore non-admin
@@ -42,14 +43,37 @@ export class Room extends ColyRoom {
     return true;
   }
 
-  onLeave (client: Client, code: CloseCode) {
+  async onLeave (client: Client) {
     if (client.sessionId === this.state.adminId) {
-      this.disconnect();
+      try {
+        const reconnection = this.allowReconnection(client, 10);
+        this.reconnections.set(client.sessionId, reconnection);
+        await reconnection;
+        this.reconnections.delete(client.sessionId);
+      } catch (e) {
+        // Admin timed out - kill the room
+        this.reconnections.delete(client.sessionId);
+        this.disconnect();
+      }
       return;
     }
 
-    this.state.players.delete(client.sessionId);
-    this.broadcast("player_left", client.sessionId);
+    // Mark player as disconnected
+    const player = this.state.players.get(client.sessionId);
+    if (!player) return;
+    player.connected = false;
+
+    try {
+      const reconnection = this.allowReconnection(client, 10);
+      this.reconnections.set(client.sessionId, reconnection);
+      await reconnection; // resolves if client reconnects, rejects if timeout
+      this.reconnections.delete(client.sessionId); // Client reconnected 
+    } catch (e) {
+      // Timed out -> remove for real
+      this.reconnections.delete(client.sessionId);
+      this.state.players.delete(client.sessionId);
+      this.broadcast("player_left", client.sessionId);
+    }
   }
 
   onDispose() {
