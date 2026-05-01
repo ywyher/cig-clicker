@@ -13,7 +13,12 @@ export class Room extends ColyRoom {
       this.state.phase = "game"
       this.lock()
       this.broadcast("game_start");
-    }
+    },
+    terminate: (client: Client) => {
+      if (client.sessionId !== this.state.adminId) return; // ignore non-admin
+      this.disconnect()
+      this.broadcast("terminate_room");
+    },
   }
 
   onJoin(client: Client, options: PlayerType & { isAdmin?: boolean }) {
@@ -61,12 +66,14 @@ export class Room extends ColyRoom {
     // Mark player as disconnected
     const player = this.state.players.get(client.sessionId);
     if (!player) return;
+
     player.connected = false;
 
     try {
       const reconnection = this.allowReconnection(client, 10);
       this.reconnections.set(client.sessionId, reconnection);
       await reconnection; // resolves if client reconnects, rejects if timeout
+      player.connected = true; 
       this.reconnections.delete(client.sessionId); // Client reconnected 
     } catch (e) {
       // Timed out -> remove for real

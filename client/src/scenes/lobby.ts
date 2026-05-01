@@ -33,13 +33,48 @@ export function createLobbyScene() {
     });
 
     if (opts?.isAdmin) {
-      const btn = k.add([
-        k.text("Start game", { size: 20 }),
-        k.pos(k.center().x, k.height() - 60),
+      k.add([
+        k.text("You are the [admin]ADMIN[/admin]", {
+          size: 20,
+          styles: {
+            admin: {
+              color: k.rgb(0, 255, 225),
+            },
+          },
+        }),
+        k.pos(k.center().x, k.height() - 100),
         k.anchor("center"),
         k.area(),
       ]);
-      btn.onClick(() => room.send("start"));
+      const startBtn = k.add([
+        k.text("[start]Start[/start] game", {
+          size: 20,
+          styles: {
+            start: {
+              color: k.rgb(0, 255, 0),
+            },
+          },
+        }),
+        k.pos(k.center().x - 100, k.height() - 60),
+        k.anchor("center"),
+        k.area(),
+      ]);
+      startBtn.onClick(() => room.send("start"));
+
+      const terminateBtn = k.add([
+        k.text("[terminate]Terminate[/terminate] room", { 
+          size: 20,
+          styles: {
+            terminate: {
+              color: k.rgb(255, 0, 0),
+            },
+          },
+        }),
+        k.pos(k.center().x + 100, k.height() - 60),
+        k.anchor("center"),
+        k.area(),
+      ]);
+      terminateBtn.onClick(() => room.send("terminate"));
     }
 
     room.onMessage("game_start", () => {

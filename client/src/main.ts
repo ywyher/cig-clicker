@@ -38,7 +38,8 @@ k.scene("main", async () => {
         const room = await client.reconnect<RoomState>(reconnectionToken);
         saveSession(room);
         status.destroy();
-        k.go("lobby", room, { isAdmin: true });
+        await new Promise<void>(resolve => room.onStateChange.once(() => resolve()));
+        k.go(room.state.phase === "lobby" ? "lobby" : "dashboard", room, { isAdmin: true });
         return;
       } catch (e) {
         clearSession();
@@ -66,7 +67,8 @@ k.scene("main", async () => {
       const room = await client.reconnect<RoomState>(reconnectionToken);
       saveSession(room);
       status.destroy();
-      k.go("lobby", room);
+      await new Promise<void>(resolve => room.onStateChange.once(() => resolve()));
+      k.go(room.state.phase, room);
       return;
     } catch (e) {
       // Reconnection failed (timed out) - clear storage and fall through to login
@@ -84,7 +86,7 @@ k.scene("main", async () => {
   ]);
 
   let hint = k.add([
-    k.text("Enter your name and press Enter", { size: 16 }),
+    k.text("Enter your name and press Enter", { size: 24 }),
     k.pos(k.center().x, k.center().y + 40),
     k.anchor("center"),
   ]);
