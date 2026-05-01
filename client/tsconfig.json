@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"noEmit": true,
+		"target": "esnext",
+		"moduleResolution": "bundler"
+	},
+	"include": [
+		"src/**/*.ts"
+	]
+}
