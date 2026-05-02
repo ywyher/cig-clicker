@@ -22,11 +22,11 @@ jobs:
         include:
           - name: client
             dockerfile: ./client/Dockerfile
-            context: ./client
+            context: .
             image-suffix: client
           - name: server
             dockerfile: ./server/Dockerfile
-            context: ./server
+            context: .
             image-suffix: server
             build-args: ""
 
