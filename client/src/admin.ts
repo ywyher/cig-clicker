@@ -1,5 +1,5 @@
 import { RoomState } from "../../server/src/rooms/schema/room-state";
-import { client } from "./lib/colysues";
+import { client } from "./lib/colyseus";
 import { k } from "./main";
 
 async function main() {

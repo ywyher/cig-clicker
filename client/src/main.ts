@@ -1,7 +1,7 @@
 import kaplay from "kaplay";
 import { createLobbyScene } from "./scenes/lobby";
 import { RoomState } from "../../server/src/rooms/schema/room-state";
-import { client } from "./lib/colysues";
+import { client } from "./lib/colyseus";
 import { PlayerType } from "../../server/src/rooms/schema/player";
 import { createGameScene } from "./scenes/game";
 import { createDashboardScene } from "./scenes/dashboard";
