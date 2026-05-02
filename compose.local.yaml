@@ -14,8 +14,6 @@ services:
       dockerfile: client/Dockerfile
       args:
         - VITE_SERVER_URL=http://localhost:2567
-    env_file:
-      - ./client/.env.development
     ports:
       - "3001:80"
     depends_on:

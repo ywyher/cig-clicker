@@ -35,7 +35,7 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
             
             docker compose -f cig-clicker.yaml pull cig-clicker-server cig-clicker-client
-            docker compose -f cig-clicker.yaml up cig-clicker-server cig-clicker-client -d --force-recreate --remove-orphans
+            docker compose -f cig-clicker.yaml up cig-clicker-server cig-clicker-client -d --force-recreate
             docker compose -f compose.yaml restart nginx
             
             # Clean up old images
