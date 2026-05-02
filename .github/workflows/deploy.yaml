@@ -1,0 +1,45 @@
+name: Deploy to VPS
+
+on:
+  workflow_run:
+    workflows: ["Docker Continuous Deployment"]
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only run if the build workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          # since github_token couldn't pull kaedama since it isn't part of the repo
+          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}  # Use PAT instead of GITHUB_TOKEN
+          GITHUB_ACTOR: ${{ github.actor }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          envs: GHCR_TOKEN,GITHUB_ACTOR
+          script: |
+            cd ~/bettermelon
+            
+            # Login to GitHub Container Registry
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+            
+            docker compose -f cig-clicker.yaml pull cig-clicker-server cig-clicker-client
+            docker compose -f cig-clicker.yaml up cig-clicker-server cig-clicker-client -d --force-recreate --remove-orphans
+            docker compose up nginx -d --force-recreate --remove-orphans
+            
+            # Clean up old images
+            docker image prune -af
+            
+            # Logout for security
+            docker logout ghcr.io

@@ -10,6 +10,8 @@ services:
   cig-clicker-client:
     image: ghcr.io/ywyher/cig-clicker-client:latest
     container_name: cig-clicker-client
+    env_file:
+      - ./client/.env.production.local
     ports:
       - "3001:80"
     depends_on:

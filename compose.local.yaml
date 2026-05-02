@@ -8,6 +8,8 @@ services:
 
   cig-clicker-client:
     build: ./client
+    env_file:
+      - ./client/.env.development
     ports:
       - "3001:80"
     depends_on:
