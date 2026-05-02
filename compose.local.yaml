@@ -9,6 +9,6 @@ services:
   cig-clicker-client:
     build: ./client
     ports:
-      - "3001:3001"
+      - "3001:80"
     depends_on:
       - cig-clicker-server

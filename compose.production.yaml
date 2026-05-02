@@ -11,6 +11,6 @@ services:
     image: ghcr.io/ywyher/cig-clicker-client:latest
     container_name: cig-clicker-client
     ports:
-      - "3001:3001"
+      - "3001:80"
     depends_on:
       - cig-clicker-server

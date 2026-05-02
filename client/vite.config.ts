@@ -23,9 +23,9 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
         output: {
-        manualChunks: (id) => {
-            if (id.includes("kaplay")) return "kaplay";
-        },
+            manualChunks: (id) => {
+                if (id.includes("kaplay")) return "kaplay";
+            },
         },
     },
     },
