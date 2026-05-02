@@ -1,0 +1,14 @@
+services:
+  cig-clicker-server:
+    build: ./server
+    ports:
+      - "2567:2567"
+    environment:
+      - NODE_ENV=development
+
+  cig-clicker-client:
+    build: ./client
+    ports:
+      - "3001:3001"
+    depends_on:
+      - cig-clicker-server

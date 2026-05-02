@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "rootDir": "..",
     "outDir": "build",
     "target": "ESNext",
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "allowJs": true,
     "strictNullChecks": false,

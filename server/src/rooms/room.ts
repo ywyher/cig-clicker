@@ -1,6 +1,6 @@
 import { Room as ColyRoom, Client, CloseCode, AuthContext } from "colyseus";
-import { Player, PlayerType } from "./schema/player";
-import { RoomState } from "./schema/room-state";
+import { Player, PlayerType } from "./schema/player.js";
+import { RoomState } from "./schema/room-state.js";
 
 export class Room extends ColyRoom {
   maxClients = 4;

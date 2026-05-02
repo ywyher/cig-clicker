@@ -20,15 +20,14 @@ export default defineConfig({
         port: 3001,
     },
     build: {
-        // disable this for low bundle sizes
-        sourcemap: true,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    kaplay: ["kaplay"],
-                },
-            },
+    sourcemap: true,
+    rollupOptions: {
+        output: {
+        manualChunks: (id) => {
+            if (id.includes("kaplay")) return "kaplay";
         },
+        },
+    },
     },
     plugins: [
         // Disable messages removing this line

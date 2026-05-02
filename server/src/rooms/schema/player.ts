@@ -1,5 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
-import { SchemaFields } from "../../types";
+import { SchemaFields } from "../../types/index.js";
 
 export class Player extends Schema {
   @type("string") public name: string = "";

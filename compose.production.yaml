@@ -1,0 +1,16 @@
+services:
+  cig-clicker-server:
+    image: ghcr.io/ywyher/cig-clicker-server:latest
+    container_name: cig-clicker-server
+    ports:
+      - "2567:2567"
+    environment:
+      - NODE_ENV=production
+
+  cig-clicker-client:
+    image: ghcr.io/ywyher/cig-clicker-client:latest
+    container_name: cig-clicker-client
+    ports:
+      - "3001:3001"
+    depends_on:
+      - cig-clicker-server
