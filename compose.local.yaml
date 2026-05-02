@@ -1,13 +1,17 @@
 services:
   cig-clicker-server:
-    build: ./server
+    build:
+      context: .
+      dockerfile: server/Dockerfile
     ports:
       - "2567:2567"
     environment:
       - NODE_ENV=development
 
   cig-clicker-client:
-    build: ./client
+    build:
+      context: .
+      dockerfile: client/Dockerfile
     env_file:
       - ./client/.env.development
     ports:
