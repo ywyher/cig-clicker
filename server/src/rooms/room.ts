@@ -19,6 +19,16 @@ export class Room extends ColyRoom {
       this.disconnect()
       this.broadcast("terminate_room");
     },
+    click: (client: Client) => {
+      const player = this.state.players.get(client.sessionId);
+      if (!player) return;
+      player.score++;
+    },
+    game_over: (_: Client, { winnerId }: { winnerId: string }) => {
+      this.broadcast("game_over", {
+        winnerId: winnerId
+      });
+    }
   }
 
   onJoin(client: Client, options: PlayerType & { isAdmin?: boolean }) {

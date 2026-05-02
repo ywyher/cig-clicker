@@ -6,6 +6,7 @@ import { PlayerType } from "../../server/src/rooms/schema/player";
 import { createGameScene } from "./scenes/game";
 import { createDashboardScene } from "./scenes/dashboard";
 import { Room } from "@colyseus/sdk";
+import { createGameOverScene } from "./scenes/game-over";
 
 export const k = kaplay({
   pixelDensity: Math.min(window.devicePixelRatio, 2),
@@ -23,6 +24,7 @@ function clearSession() {
 createLobbyScene();
 createGameScene();
 createDashboardScene();
+createGameOverScene();
 
 k.scene("main", async () => {
   const reconnectionToken = localStorage.getItem("reconnectionToken");
