@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "my-app",
+  "name": "server",
   "version": "0.17.0",
   "description": "npm init template for bootstrapping an empty Colyseus project",
   "type": "module",
@@ -9,9 +9,10 @@
     "node": ">= 20.9.0"
   },
   "scripts": {
-    "start": "tsx watch src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "start": "node build/index.js",
     "loadtest": "tsx loadtest/example.ts --room main_room --numClients 2",
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "pnpm run clean && tsc -p tsconfig.build.json",
     "clean": "rimraf build",
     "test": "mocha -r tsx test/**.test.ts --exit --timeout 15000"
   },

@@ -1,5 +1,5 @@
 {
-	"name": "cig-clicker",
+	"name": "client",
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
