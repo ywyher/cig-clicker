@@ -2,6 +2,7 @@ import { Callbacks, Room } from "@colyseus/sdk";
 import { k } from "../main";
 import { RoomState } from "../../../server/src/rooms/schema/room-state";
 import { setupScene } from "../lib/utils/room";
+import { PlayerType } from "../../../server/src/rooms/schema/player";
 
 export function createLobbyScene() {
   k.scene("lobby", (room: Room<RoomState>, opts: { isAdmin?: boolean }) => {
@@ -24,11 +25,13 @@ export function createLobbyScene() {
       });
     }
 
-    callbacks.onAdd("players", (player, sessionId) => {
+    callbacks.onAdd("players", (player, _sessionId) => {
+      k.debug.log(`Player ${player.name} joined!`);
       rebuildLabels();
     });
 
-    callbacks.onRemove("players", () => {
+    callbacks.onRemove("players", (player, _sessionId) => {
+      k.debug.log(`Player ${player.name} left!`);
       rebuildLabels();
     });
 

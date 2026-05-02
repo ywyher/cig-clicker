@@ -9,15 +9,27 @@ export class Room extends ColyRoom {
   
   messages = {
     start: (client: Client) => {
-      if (client.sessionId !== this.state.adminId) return; // ignore non-admin
+      if (client.sessionId !== this.state.adminId) return;
       this.state.phase = "game"
       this.lock()
       this.broadcast("game_start");
     },
     terminate: (client: Client) => {
-      if (client.sessionId !== this.state.adminId) return; // ignore non-admin
+      if (client.sessionId !== this.state.adminId) return;
       this.disconnect()
       this.broadcast("terminate_room");
+    },
+    leave: (client: Client) => {
+      console.log(`${client.sessionId} left.`)
+      this.broadcast("player_left", {
+        playerId: client.sessionId
+      });
+    },
+    join: (client: Client) => {
+      console.log(`${client.sessionId} joined.`)
+      this.broadcast("player_joined", {
+        playerId: client.sessionId
+      });
     },
     click: (client: Client) => {
       const player = this.state.players.get(client.sessionId);
@@ -32,7 +44,6 @@ export class Room extends ColyRoom {
   }
 
   onJoin(client: Client, options: PlayerType & { isAdmin?: boolean }) {
-    console.log(options, "joined!");
     if (options?.isAdmin) {
       this.state.adminId = client.sessionId;
       return;
@@ -58,7 +69,7 @@ export class Room extends ColyRoom {
     return true;
   }
 
-  async onLeave (client: Client) {
+  async onLeave (client: Client, code: number) {
     if (client.sessionId === this.state.adminId) {
       try {
         const reconnection = this.allowReconnection(client, 10);
@@ -77,6 +88,15 @@ export class Room extends ColyRoom {
     const player = this.state.players.get(client.sessionId);
     if (!player) return;
 
+    // If they clicked leave intentionally, skip reconnection window
+    if (code === CloseCode.CONSENTED) {
+      this.state.players.delete(client.sessionId);
+      this.broadcast("player_left", {
+        playerId: client.sessionId
+      });
+      return;
+    }
+
     player.connected = false;
 
     try {
@@ -89,7 +109,9 @@ export class Room extends ColyRoom {
       // Timed out -> remove for real
       this.reconnections.delete(client.sessionId);
       this.state.players.delete(client.sessionId);
-      this.broadcast("player_left", client.sessionId);
+      this.broadcast("player_left", {
+        playerId: client.sessionId
+      });
     }
   }
 
