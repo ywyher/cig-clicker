@@ -24,6 +24,8 @@ jobs:
             dockerfile: ./client/Dockerfile
             context: .
             image-suffix: client
+            build-args: |
+              VITE_SERVER_URL=https://cig-clicker.perfect-health.net/server
           - name: server
             dockerfile: ./server/Dockerfile
             context: .

@@ -6,6 +6,10 @@ COPY client/package.json ./client/
 COPY server/package.json ./server/
 RUN pnpm install --frozen-lockfile
 COPY . .
+
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+
 RUN pnpm --filter client build
 
 FROM nginx:alpine

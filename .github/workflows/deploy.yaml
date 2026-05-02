@@ -36,7 +36,7 @@ jobs:
             
             docker compose -f cig-clicker.yaml pull cig-clicker-server cig-clicker-client
             docker compose -f cig-clicker.yaml up cig-clicker-server cig-clicker-client -d --force-recreate --remove-orphans
-            docker compose up nginx -d --force-recreate --remove-orphans
+            docker compose -f compose.yaml restart nginx
             
             # Clean up old images
             docker image prune -af

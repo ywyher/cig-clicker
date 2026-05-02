@@ -1,4 +1,15 @@
 {
   "name": "cig-clicker",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@colyseus/schema": "4.0.21",
+      "@colyseus/sdk": "0.17.21",
+      "typescript": "5.9.3"
+    }
+  },
+  "workspaces": ["client", "server"]
 }
