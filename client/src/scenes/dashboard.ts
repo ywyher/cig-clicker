@@ -14,7 +14,7 @@ export function createDashboardScene() {
     let index = 0;
     room.state.players.forEach((player, sessionId) => {
       const label = k.add([
-        k.text(`${player.name}: ${player.score}`, { size: 16 }),
+        k.text(`${player.name}: ${player.score}`, { size: 16, font: "font" }),
         k.pos(40, 40 + index * 32),
       ]);
       scoreLabels.set(sessionId, label);

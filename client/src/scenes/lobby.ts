@@ -18,7 +18,7 @@ export function createLobbyScene() {
       labelObjs = [];
       room.state.players.forEach((player) => {
         const obj = k.add([
-          k.text(`player: ${player.name}`, { size: 16 }),
+          k.text(`player: ${player.name}`, { size: 16, font: "font" }),
           k.pos(40, 40 + labelObjs.length * 32),
         ]);
         labelObjs.push(obj);
@@ -39,6 +39,7 @@ export function createLobbyScene() {
       k.add([
         k.text("You are the [admin]ADMIN[/admin]", {
           size: 20,
+          font: "font",
           styles: {
             admin: {
               color: k.rgb(0, 255, 225),
@@ -52,6 +53,7 @@ export function createLobbyScene() {
       const startBtn = k.add([
         k.text("[start]Start[/start] game", {
           size: 20,
+          font: "font",
           styles: {
             start: {
               color: k.rgb(0, 255, 0),
@@ -67,6 +69,7 @@ export function createLobbyScene() {
       const terminateBtn = k.add([
         k.text("[terminate]Terminate[/terminate] room", { 
           size: 20,
+          font: "font",
           styles: {
             terminate: {
               color: k.rgb(255, 0, 0),
@@ -80,11 +83,11 @@ export function createLobbyScene() {
       terminateBtn.onClick(() => room.send("terminate"));
     }
 
-    room.onMessage("game_start", () => {
+    room.onMessage("game_start", ({ firstQuestionAt }: { firstQuestionAt: number }) => {
       if (opts?.isAdmin) {
         k.go("dashboard", room);
       } else {
-        k.go("game", room);
+        k.go("game", room, { firstQuestionAt });
       }
     });
 

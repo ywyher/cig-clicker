@@ -27,7 +27,7 @@ export function createGameOverScene() {
       : isWinner ? k.rgb(255, 215, 0) : k.rgb(200, 80, 80);
 
     k.add([
-      k.text(resultText, { size: 64, align: "center" }),
+      k.text(resultText, { size: 64, align: "center", font: "font" }),
       k.anchor("center"),
       k.pos(k.center()),
       k.color(resultColor),
@@ -36,7 +36,7 @@ export function createGameOverScene() {
     // Subtitle
     const subtitle = isAdmin ? "Press Space to start a new game" : "Press Space to play again";
     k.add([
-      k.text(subtitle, { size: 24 }),
+      k.text(subtitle, { size: 24, font: "font" }),
       k.anchor("center"),
       k.pos(k.width() / 2, k.height() / 2 + 80),
       k.color(150, 150, 150),
@@ -46,7 +46,7 @@ export function createGameOverScene() {
     let y = k.height() / 2 + 140;
     room.state.players.forEach((p, id) => {
       k.add([
-        k.text(`${p.name}: ${p.score}${id === room.sessionId ? " (you)" : ""}`, { size: 18 }),
+        k.text(`${p.name}: ${p.score}${id === room.sessionId ? " (you)" : ""}`, { size: 18, font: "font" }),
         k.anchor("center"),
         k.pos(k.width() / 2, y),
         k.color(id === room.sessionId ? k.rgb(120, 200, 255) : k.rgb(200, 200, 200)),
@@ -66,7 +66,7 @@ export function createGameOverScene() {
         // k.go("dashboard", room);  // admin goes back to dashboard, not game
       } else {
         k.add([
-          k.text("Waiting for host to restart...", { size: 16 }),
+          k.text("Waiting for host to restart...", { size: 16, font: "font" }),
           k.anchor("center"),
           k.pos(k.width() / 2, y + 20),
           k.color(150, 150, 150),

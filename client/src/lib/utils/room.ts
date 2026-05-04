@@ -29,7 +29,7 @@ export function setupScene(room: Room<RoomState>) {
       ]);
 
       k.add([
-        k.text("Terminate Room", { size: 16 }),
+        k.text("Terminate Room", { size: 16, font: "font" }),
         k.pos(k.width() - 180 + 75, k.height() - 60 + 20),
         k.anchor("center"),
         k.color(k.Color.fromHex("#ffffff")),
@@ -50,7 +50,7 @@ export function setupScene(room: Room<RoomState>) {
       ]);
 
       k.add([
-        k.text("Leave Room", { size: 16 }),
+        k.text("Leave Room", { size: 16, font: "font" }),
         k.pos(k.width() - 140 + 60, k.height() - 60 + 20),
         k.anchor("center"),
         k.color(k.Color.fromHex("#ffffff")),
