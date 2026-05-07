@@ -34,7 +34,7 @@ export function createGameScene() {
     ]);
 
     let timerDeadline: number | null = firstQuestionAt;
-    let timerMode: "next" | "expiry" | null = "next";
+    let timerMode: "next" | "expiry" | "think" | null = "next";
 
     k.onUpdate(() => {
       if (!timerDeadline || !timerMode) {
@@ -42,9 +42,10 @@ export function createGameScene() {
         return;
       }
       const secsLeft = Math.max(0, Math.ceil((timerDeadline - Date.now()) / 1000));
-      timerLabel.text = timerMode === "next"
-        ? `Next question in ${secsLeft}s`
-        : `Answer in ${secsLeft}s`;
+      timerLabel.text =
+        timerMode === "next"  ? `Next question in ${secsLeft}s` :
+        timerMode === "think" ? `Answers unlock in ${secsLeft}s` :
+                                `Answer in ${secsLeft}s`;
     });
 
     callbacks.listen(player, "score", (serverScore) => {
@@ -63,10 +64,6 @@ export function createGameScene() {
 
     k.onMousePress(() => {
       if (questionActive || justAnswered) return;
-      if (score >= 100) {
-        room.send("game_over", { winnerId: room.sessionId });
-        return;
-      }
       room.send("click");
     });
 
@@ -79,15 +76,22 @@ export function createGameScene() {
       k.wait(0.1, () => { justAnswered = false; });
     };
 
-    room.onMessage("question", (question: Omit<Question, "correctIndex"> & { expiresAt: number }) => {
+    room.onMessage("question", (question: Omit<Question, "correctIndex"> & {   thinkUntil: number; expiresAt: number  }) => {
+      console.log(`question`, question)
       if (questionActive) return;
       questionActive = true;
 
-      timerMode = "expiry";
-      timerDeadline = question.expiresAt;
+      timerMode = "think";
+      timerDeadline = question.thinkUntil;
 
       showQuestion({
         question,
+        lockedUntil: question.thinkUntil,
+        expiresAt: question.expiresAt,
+        onThinkEnd: () => {
+          timerMode = "expiry";
+          timerDeadline = question.expiresAt;
+        },
         onAnswer: (choiceIndex: number) => {
           room.send("answer", { questionId: question.id, choiceIndex });
           timerMode = "next"
@@ -103,10 +107,11 @@ export function createGameScene() {
       timerDeadline = nextQuestionAt;
     });
 
-    room.onMessage("game_over", ({ winnerId }: { winnerId: string }) => {
+    room.onMessage("game_over", ({ winners }: { winners: string[] }) => {
+      console.log(winners)
       timerMode = null;
       timerDeadline = null;
-      k.go("game_over", room, { isWinner: winnerId === room.sessionId });
+      k.go("game_over", room, { winners });
     });
   });
 }

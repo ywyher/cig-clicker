@@ -30,8 +30,8 @@ export function createDashboardScene() {
       scoreLabels.delete(sessionId);
     });
 
-    room.onMessage("game_over", ({ winnerId }: { winnerId: string }) => {
-      k.go("game_over", room, { isWinner: false });
+    room.onMessage("game_over", ({ winners }: { winners: string[] }) => {
+      k.go("game_over", room, { winners });
     });
   });
 }

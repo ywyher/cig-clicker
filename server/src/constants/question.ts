@@ -1,7 +1,8 @@
-export const ANSWER_WINDOW_MS = 8_000;
-export const QUESTION_INTERVAL_MS = 12_000; // must be > ANSWER_WINDOW_MS
-export const GAP_MS = QUESTION_INTERVAL_MS - ANSWER_WINDOW_MS; // 4s
-// gap between questions -> QUESTION_INTERVAL_MS - ANSWER_WINDOW_MS
+// constants/question.ts
+export const THINK_WINDOW_MS = 5_000;
+export const ANSWER_WINDOW_MS = 5_000;
+export const QUESTION_INTERVAL_MS = 5_000; // gap *between* questions (after expiry)
+export const QUESTION_CYCLE_MS = THINK_WINDOW_MS + ANSWER_WINDOW_MS + QUESTION_INTERVAL_MS;
 
 export interface Question {
   id: number;

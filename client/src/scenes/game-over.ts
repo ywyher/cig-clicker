@@ -4,11 +4,12 @@ import { RoomState } from "../../../server/src/rooms/schema/room-state";
 import { setupScene } from "../lib/utils/room";
 
 export function createGameOverScene() {
-  k.scene("game_over", (room: Room<RoomState>, { isWinner }: { isWinner: boolean }) => {
-    setupScene(room);
-
+  k.scene("game_over", (room: Room<RoomState>, { winners }: { winners: string[] }) => {
+    const isTie = winners.length > 1;
+    const isWinner = winners.includes(room.sessionId);
     const isAdmin = room.state.adminId === room.sessionId;
-    const winner = [...room.state.players.values()].find(p => p.score >= 2);
+
+    setupScene(room);
 
     k.add([
       k.rect(k.width(), k.height()),
@@ -17,13 +18,14 @@ export function createGameOverScene() {
       k.pos(0, 0),
     ]);
 
-    // Result text — admin sees who won, not "you lose"
-    const resultText = isAdmin
-      ? `${winner?.name ?? "Someone"} wins!`
-      : isWinner ? "You Win! 🏆" : "You Lose";
+    const resultText = isTie
+      ? isWinner ? "It's a Tie - You're one of them!" : "It's a Tie!"
+      : isAdmin
+        ? `${room.state.players.get(winners[0])?.name ?? "Someone"} wins!`
+        : isWinner ? "You Win!" : "You Lose";
 
-    const resultColor = isAdmin
-      ? k.rgb(200, 200, 200)
+    const resultColor = isTie
+      ? k.rgb(255, 200, 50)
       : isWinner ? k.rgb(255, 215, 0) : k.rgb(200, 80, 80);
 
     k.add([
@@ -33,8 +35,7 @@ export function createGameOverScene() {
       k.color(resultColor),
     ]);
 
-    // Subtitle
-    const subtitle = isAdmin ? "Press Space to start a new game" : "Press Space to play again";
+    const subtitle = isAdmin ? "Press Space to start a new game" : "Waiting for host to restart...";
     k.add([
       k.text(subtitle, { size: 24, font: "font" }),
       k.anchor("center"),
@@ -42,36 +43,26 @@ export function createGameOverScene() {
       k.color(150, 150, 150),
     ]);
 
-    // Player scores summary
     let y = k.height() / 2 + 140;
     room.state.players.forEach((p, id) => {
+      const isYou = id === room.sessionId;
+      const isThisWinner = winners.includes(id);
       k.add([
-        k.text(`${p.name}: ${p.score}${id === room.sessionId ? " (you)" : ""}`, { size: 18, font: "font" }),
+        k.text(`${isThisWinner ? "👑 " : ""}${p.name}: ${p.score}${isYou ? " (you)" : ""}`, { size: 18, font: "font" }),
         k.anchor("center"),
         k.pos(k.width() / 2, y),
-        k.color(id === room.sessionId ? k.rgb(120, 200, 255) : k.rgb(200, 200, 200)),
+        k.color(isYou ? k.rgb(120, 200, 255) : k.rgb(200, 200, 200)),
       ]);
       y += 28;
     });
 
-    // Prevent firing multiple times if space is pressed repeatedly
-    let restarting = false;
-
-    k.onKeyPress("space", () => {
-      if (restarting) return;
-
-      if (isAdmin) {
+    if (isAdmin) {
+      let restarting = false;
+      k.onKeyPress("space", () => {
+        if (restarting) return;
         restarting = true;
-        // room.send("start");
-        // k.go("dashboard", room);  // admin goes back to dashboard, not game
-      } else {
-        k.add([
-          k.text("Waiting for host to restart...", { size: 16, font: "font" }),
-          k.anchor("center"),
-          k.pos(k.width() / 2, y + 20),
-          k.color(150, 150, 150),
-        ]);
-      }
-    });
+        room.send("start");
+      });
+    }
   });
 }
