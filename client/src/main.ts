@@ -10,10 +10,17 @@ import { createGameOverScene } from "./scenes/game-over";
 import { QUESTION_INTERVAL_MS } from "../../server/src/constants/question";
 
 export const k = kaplay({
+  width: 430,
+  height: 932,       // ~full portrait phone height
+  letterbox: true,   // pillarboxes on desktop, keeps aspect ratio
+  background: [20, 20, 20],
   pixelDensity: Math.min(window.devicePixelRatio, 2),
-  background: "black"
+  crisp: true
 });
 k.loadFont("font", "/fonts/minecraftia-regular.ttf");
+k.loadSprite("bg", "/sprites/background.png");
+const BASE_WIDTH = 300;
+const BASE_HEIGHT = 200;
 
 function saveSession(room: Room<RoomState>) {
   localStorage.setItem("reconnectionToken", room.reconnectionToken);
@@ -29,6 +36,16 @@ createDashboardScene();
 createGameOverScene();
 
 k.scene("main", () => {
+  k.add([
+		k.sprite("bg"),
+		k.pos(0, 0),
+    k.scale(
+      k.width() / BASE_WIDTH,
+      k.height() / BASE_HEIGHT,
+    ),
+		k.fixed(), // stays on screen if camera moves
+		k.z(-100), // behind everything
+	]);
   const reconnectionToken = localStorage.getItem("reconnectionToken");
 
   (async () => {
