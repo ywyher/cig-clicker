@@ -11,14 +11,16 @@ import { QUESTION_INTERVAL_MS } from "../../server/src/constants/question";
 
 export const k = kaplay({
   width: 430,
-  height: 932,       // ~full portrait phone height
-  letterbox: true,   // pillarboxes on desktop, keeps aspect ratio
+  height: 932,
+  letterbox: true,
   background: [20, 20, 20],
   pixelDensity: Math.min(window.devicePixelRatio, 2),
-  crisp: true
+  crisp: true,
 });
+
 k.loadFont("font", "/fonts/minecraftia-regular.ttf");
 k.loadSprite("bg", "/sprites/background.png");
+
 const BASE_WIDTH = 300;
 const BASE_HEIGHT = 200;
 
@@ -30,6 +32,19 @@ function clearSession() {
   localStorage.removeItem("reconnectionToken");
 }
 
+// function requestFullscreen() {
+//   const el = document.documentElement;
+//   if (el.requestFullscreen) {
+//     el.requestFullscreen().catch(() => {});
+//   } else if ((el as any).webkitRequestFullscreen) {
+//     (el as any).webkitRequestFullscreen();
+//   }
+// }
+
+// requestFullscreen();
+// document.addEventListener("touchstart", requestFullscreen, { once: true });
+// document.addEventListener("click", requestFullscreen, { once: true });
+
 createLobbyScene();
 createGameScene();
 createDashboardScene();
@@ -37,15 +52,13 @@ createGameOverScene();
 
 k.scene("main", () => {
   k.add([
-		k.sprite("bg"),
-		k.pos(0, 0),
-    k.scale(
-      k.width() / BASE_WIDTH,
-      k.height() / BASE_HEIGHT,
-    ),
-		k.fixed(), // stays on screen if camera moves
-		k.z(-100), // behind everything
-	]);
+    k.sprite("bg"),
+    k.pos(0, 0),
+    k.scale(k.width() / BASE_WIDTH, k.height() / BASE_HEIGHT),
+    k.fixed(),
+    k.z(-100),
+  ]);
+
   const reconnectionToken = localStorage.getItem("reconnectionToken");
 
   (async () => {
@@ -107,25 +120,66 @@ k.scene("main", () => {
   })();
 
   function showLoginUI() {
-    let input = k.add([
-      k.text(""),
-      k.textInput(),
-      k.pos(k.center()),
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Enter your name...";
+    input.maxLength = 20;
+    input.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      padding: 10px 16px;
+      border: 2px solid white;
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      text-align: center;
+      outline: none;
+      z-index: 9999;
+      width: 220px;
+    `;
+    document.body.appendChild(input);
+    input.focus();
+
+    const error = k.add([
+      k.text("", { 
+        size: 24,
+        styles: {
+          error: {
+            color: k.rgb('red')
+          }
+        }
+      }),
+      k.pos(k.center().x, k.center().y - 80),
       k.anchor("center"),
-      "usernameInput",
+    ]);
+    const btn = k.add([
+      k.rect(160, 50, { radius: 8 }),
+      k.color(255, 255, 255),
+      k.pos(k.center().x, k.center().y + 80),
+      k.anchor("center"),
+      k.area(),
+    ]);
+    btn.add([
+      k.text("Join", { size: 24 }),
+      k.color(0, 0, 0),
+      k.anchor("center"),
     ]);
 
-    let hint = k.add([
-      k.text("Enter your name and press Enter", { size: 24 }),
-      k.pos(k.center().x, k.center().y + 40),
-      k.anchor("center"),
-    ]);
+    function cleanup() {
+      document.body.removeChild(input);
+      btn.destroy();
+    }
 
-    k.onKeyPress("enter", async () => {
-      const username = input.text.trim() || "Player";
-
-      hint.destroy();
-      input.destroy();
+    async function submit() {
+      const username = input.value.trim();
+      
+      if (!username) {
+        error.text = "[error]Username is required![/error]"
+        return;
+      }
 
       const status = k.add([
         k.text("Joining room..."),
@@ -138,33 +192,33 @@ k.scene("main", () => {
           name: username,
         } as PlayerType);
         saveSession(room);
+        k.setFullscreen(true)
+        cleanup();
         room.send("join");
         k.go("lobby", room);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Failed to connect.";
+        const msg = e instanceof Error ? `[error]${e.message}[/error]` : "[error]Failed to connect.[/error]";
         status.destroy();
-
-        k.add([
-          k.text(msg),
-          k.pos(k.center().x, k.center().y - 100),
-          k.anchor("center"),
-        ]);
-
-        showLoginUI();  // re-show on error instead of mutating let vars
+        error.text = msg;
+        showLoginUI();
       }
+    }
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submit();
     });
+    btn.onClick(() => submit());
   }
 });
 
 k.scene("main_dev", async () => {
   const room = await client.joinOrCreate<RoomState>("main_room", {
-    name: "player"
+    name: "player",
   });
 
-  console.log("ghiiaiodasd")
-  room.send("start")
-  k.go("game", room, { firstQuestionAt: Date.now() + QUESTION_INTERVAL_MS })
-})
+  room.send("start");
+  k.go("game", room, { firstQuestionAt: Date.now() + QUESTION_INTERVAL_MS });
+});
 
-k.go("main")
+k.go("main");
 // k.go("main_dev")
