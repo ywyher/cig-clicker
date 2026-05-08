@@ -17,7 +17,7 @@ COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY --from=builder /app/client/package.json ./client/package.json
 COPY --from=builder /app/server/package.json ./server/package.json
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --filter server...
 COPY --from=builder /app/server/build ./server/build
 EXPOSE 2567
 CMD ["node", "server/build/index.js"]
