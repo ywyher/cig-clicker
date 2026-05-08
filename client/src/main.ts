@@ -129,22 +129,23 @@ k.scene("main", () => {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 20px;
-      padding: 10px 16px;
-      border: 2px solid white;
-      border-radius: 8px;
+      font-size: clamp(18px, 5vw, 28px);
+      padding: 14px 20px;
+      border: 3px solid white;
+      border-radius: 12px;
       background: #111;
       color: white;
       text-align: center;
       outline: none;
       z-index: 9999;
-      width: 220px;
+      width: clamp(240px, 70vw, 400px);
+      box-sizing: border-box;
     `;
     document.body.appendChild(input);
     input.focus();
 
     const error = k.add([
-      k.text("", { 
+      k.text("", {
         size: 24,
         styles: {
           error: {
